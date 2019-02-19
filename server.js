@@ -7,6 +7,8 @@ const server = express();
 server.use(express.json());
 server.use('/api/posts', postsRouter);
 
+
+//Initial GET:
 server.get('/', (req, res) => {
     res.send('Node Express Lab -- success');
   });

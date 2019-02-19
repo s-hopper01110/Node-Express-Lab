@@ -9,6 +9,8 @@ const router = express.Router();
 // If there's an error in retrieving the posts from the database: cancel the request & respond with HTTP status code 500.
 // return the following JSON object: { error: "The posts information could not be retrieved." }.
 
+//GET:
+
 router.get('/', (req, res ) => {
     db.find()
     .then(posts => {
@@ -28,6 +30,8 @@ router.get('/', (req, res ) => {
 //If there's an error in retrieving the post from the database: cancel the request.
 // respond with HTTP status code 500.
 // return the following JSON object: { error: "The post information could not be retrieved." }.
+
+//GET:
 
 router.get('/:id', ( req, res ) => {
     const { id } = req.params;
@@ -103,6 +107,47 @@ router.delete('/:id', ( req, res ) => {
     .catch(err => {
         res.status(500).json({ error: 'The post could not be removed' })
     })
+})
+
+
+// When the client makes a PUT request to /api/posts/:id:
+
+// If the post with the specified id is not found: return HTTP status code 404 (Not Found).
+// return the following JSON object: { message: "The post with the specified ID does not exist." }.
+
+
+//If the request body is missing the title or contents property: cancel the request & respond with HTTP status code 400 (Bad Request).
+// return the following JSON response: { errorMessage: "Please provide title and contents for the post." }.
+
+// If there's an error when updating the post: cancel the request.
+// respond with HTTP status code 500.
+// return the following JSON object: { error: "The post information could not be modified." }.
+
+//If the post is found and the new information is valid: update the post document in the database using the new information sent in the request body.
+// return HTTP status code 200 (OK).
+// return the newly updated post.
+
+//PUT:
+
+router.put('/:id', ( req, res ) => {
+    const { id } = req.params;
+    const changes = req.body;
+
+    db
+    .update( id, changes ) 
+    .then(postsID => {
+        if(!postsID) {
+            res.status(404).json({ success: false, message:'The post with the specified ID does not exist.'  })
+        }else if ( !changes.title || !changes.contents ){
+            return res.status(400).json({ success: false, message: 'Please provide title and contents for user' })
+        }else{
+            return res.status(200).json({ success: true, changes })
+    }
+
+})
+.catch(err=> {
+    res.status(500).json({ success: false, error:'The post information could not be modified.' })
+})
 })
 
 module.exports = router; 
